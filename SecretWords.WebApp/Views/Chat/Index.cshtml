@@ -1,0 +1,11 @@
+﻿<h2>Mock Chat</h2>
+
+<form asp-action="Send" method="post">
+    <input type="text" name="message" placeholder="Type your message" required />
+    <button type="submit">Send</button>
+</form>
+
+@if (ViewBag.BloopedMessage != null)
+{
+    <p><strong>Blooped:</strong> @ViewBag.BloopedMessage</p>
+}

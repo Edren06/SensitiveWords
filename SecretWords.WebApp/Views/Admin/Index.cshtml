@@ -1,0 +1,104 @@
+﻿@model List<SensitiveWordViewModel>
+
+<h2>Manage Sensitive Words</h2>
+
+<div class="mb-3">
+    <input type="text" id="searchBox" class="form-control" placeholder="Search words..." />
+</div>
+
+<form id="createForm" class="mb-3">
+    <div class="input-group">
+        <input type="text" id="newWord" class="form-control" placeholder="New word" required />
+        <button type="submit" class="btn btn-success">Add</button>
+    </div>
+</form>
+
+<div id="alertContainer"></div>
+
+<table class="table table-striped" id="wordsTable">
+    <thead>
+        <tr>
+            <th>Word</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var word in Model)
+        {
+            <tr data-word="@word.Word.ToLower()">
+                <td>
+                    <input type="text" value="@word.Word" class="form-control word-input" data-id="@word.Id" />
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm update-btn" data-id="@word.Id">Update</button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="@word.Id">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        function showAlert(message, type = 'success') {
+            const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`;
+            $('#alertContainer').html(alertHtml);
+            setTimeout(() => $('.alert').alert('close'), 3000);
+        }
+
+        // Search filter
+        $('#searchBox').on('input', function() {
+            const query = $(this).val().toLowerCase();
+            $('#wordsTable tbody tr').each(function() {
+                $(this).toggle($(this).data('word').includes(query));
+            });
+        });
+
+        // Add new word
+        $('#createForm').submit(function(e) {
+            e.preventDefault();
+            const word = $('#newWord').val();
+            if (!word) return;
+
+            $.post('@Url.Action("Create")', { word }, function(data) {
+                if (data.success) {
+                    const row = `<tr data-word="${data.word.word.toLowerCase()}">
+                        <td><input type="text" value="${data.word.word}" class="form-control word-input" data-id="${data.word.id}" /></td>
+                        <td>
+                            <button class="btn btn-primary btn-sm update-btn" data-id="${data.word.id}">Update</button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="${data.word.id}">Delete</button>
+                        </td>
+                    </tr>`;
+                    $('#wordsTable tbody').append(row);
+                    $('#newWord').val('');
+                    showAlert('Word added successfully!');
+                }
+            });
+        });
+
+        // Update word
+        $(document).on('click', '.update-btn', function() {
+            const id = $(this).data('id');
+            const word = $(this).closest('tr').find('.word-input').val();
+            $.post('@Url.Action("Update")', { Id: id, Word: word }, function() {
+                showAlert('Word updated successfully!');
+            });
+        });
+
+        // Delete word
+        $(document).on('click', '.delete-btn', function() {
+            if (!confirm('Are you sure you want to delete this word?')) return;
+
+            const id = $(this).data('id');
+            const row = $(this).closest('tr');
+            $.post('@Url.Action("Delete")', { id }, function() {
+                row.remove();
+                showAlert('Word deleted successfully!');
+            });
+        });
+    </script>
+}
