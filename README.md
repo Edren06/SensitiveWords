@@ -1,20 +1,20 @@
-# Sensitive Words
+### Sensitive Words
 
 Simple .net Core project that demonstrates sensitive word management and message filtering (a.k.a "blooping"). This application includes:
 
-# Features
-### API
+### Features
+# API
 - Add, update, delete, and retrieve sensitive words.
 - Filter messages and replace sensitive words with asterisks (`*`).
 - Swagger documentation for easy API testing.
 - Dapper Micro ORM implementation
 
-### MVC Frontend
+# MVC Frontend
 - Admin dashboard to manage sensitive words (CRUD operations).
 - Chat page to demonstrate message filtering.
 - Inline editing, search, and confirmation popups.
 
-## Running the application
+# Running the application
 The application has been created in visual studio IDE, you will need to:
 - Restore the attached database "SensitiveWords.bak" with MSSQL
 - The API and the front end should be run simultaneously.
